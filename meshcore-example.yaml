@@ -7,10 +7,9 @@ esp32:
     type: esp-idf
 
 external_components:
-  - source:
-      type: local
-      path: components
+  - source: github://urbanframe/esphome-meshcore@main
     components: [meshcore]
+    refresh: 1d
 
 spi:
   clk_pin: GPIO10
