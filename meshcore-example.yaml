@@ -1,0 +1,67 @@
+esphome:
+  name: meshcore-node
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [meshcore]
+
+spi:
+  clk_pin: GPIO10
+  mosi_pin: GPIO7
+  miso_pin: GPIO6
+
+sx126x:
+  id: lora_radio
+  cs_pin: GPIO8
+  busy_pin: GPIO4
+  dio1_pin: GPIO3
+  rst_pin: GPIO5
+  frequency: 869525000
+  bandwidth: 250_0kHz
+  spreading_factor: 11
+  coding_rate: CR_4_5
+  preamble_size: 16
+  sync_value: [0x2B]  # MeshCore's public sync word — confirm against current firmware source before relying on this
+
+meshcore:
+  id: mesh_node
+  lora: lora_radio
+  # Generate a real keypair once (see README / tools/generate_identity.py)
+  # and pin it here so your node keeps the same identity across
+  # reboots/reflashes — otherwise you get a new, unrecognisable address
+  # every boot and the peer_public_key handshake below can't work.
+  public_key: !secret meshcore_public_key
+  private_key: !secret meshcore_private_key
+  node_name: "ESPHome MeshCore Node"
+
+  # The one person you want to talk to. Get this from their MeshCore app
+  # (their own node's public key, NOT a channel PSK). With this set, direct
+  # messages from anyone else are ignored, and send_message always targets
+  # them — no contact table or discovery needed.
+  peer_public_key: !secret meshcore_peer_public_key
+
+  on_message:
+    then:
+      - logger.log:
+          format: "MeshCore message: %s"
+          args: ["text.c_str()"]
+      # e.g. forward it somewhere useful:
+      # - homeassistant.event:
+      #     event: esphome.meshcore_message
+      #     data:
+      #       text: !lambda 'return text;'
+
+button:
+  - platform: template
+    name: "Send MeshCore test message"
+    on_press:
+      - meshcore.send_message:
+          id: mesh_node
+          text: "Hello from ESPHome!"
