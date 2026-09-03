@@ -2,26 +2,29 @@ esphome:
   name: meshcore-node
 
 esp32:
-  board: esp32-c3-devkitm-1
+  board: ttgo-t-beam
   framework:
     type: esp-idf
 
 external_components:
-  - source: github://urbanframe/esphome-meshcore@main
+  - source:
+      type: local
+      path: components
     components: [meshcore]
-    refresh: 1d
 
 spi:
-  clk_pin: GPIO10
-  mosi_pin: GPIO7
-  miso_pin: GPIO6
+  clk_pin: GPIO5
+  mosi_pin: GPIO27
+  miso_pin: GPIO19
 
-sx126x:
+sx127x:
   id: lora_radio
-  cs_pin: GPIO8
-  busy_pin: GPIO4
-  dio1_pin: GPIO3
-  rst_pin: GPIO5
+  cs_pin: GPIO18
+  rst_pin: GPIO23
+  dio0_pin: GPIO26
+  modulation: LORA
+  pa_pin: BOOST     # T-Beam's SX1276 is wired to the PA_BOOST pin, not RFO
+  pa_power: 17      # BOOST mode max is 17; ESPHome will reject >17 here
   frequency: 869525000
   bandwidth: 250_0kHz
   spreading_factor: 11
