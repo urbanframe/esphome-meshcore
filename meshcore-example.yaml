@@ -1,0 +1,69 @@
+esphome:
+  name: meshcore-node
+
+esp32:
+  board: ttgo-t-beam
+  framework:
+    type: esp-idf
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [meshcore]
+
+spi:
+  clk_pin: GPIO5
+  mosi_pin: GPIO27
+  miso_pin: GPIO19
+
+sx127x:
+  id: lora_radio
+  cs_pin: GPIO18
+  rst_pin: GPIO23
+  dio0_pin: GPIO26
+  modulation: LORA
+  pa_pin: BOOST     # T-Beam's SX1276 is wired to the PA_BOOST pin, not RFO
+  pa_power: 17      # BOOST mode max is 17; ESPHome will reject >17 here
+  frequency: 869525000
+  bandwidth: 250_0kHz
+  spreading_factor: 11
+  coding_rate: CR_4_5
+  preamble_size: 16
+  sync_value: [0x2B]  # MeshCore's public sync word — confirm against current firmware source before relying on this
+
+meshcore:
+  id: mesh_node
+  lora: lora_radio
+  # Generate a real keypair once (see README / tools/generate_identity.py)
+  # and pin it here so your node keeps the same identity across
+  # reboots/reflashes — otherwise you get a new, unrecognisable address
+  # every boot and the peer_public_key handshake below can't work.
+  public_key: !secret meshcore_public_key
+  private_key: !secret meshcore_private_key
+  node_name: "ESPHome MeshCore Node"
+
+  # The one person you want to talk to. Get this from their MeshCore app
+  # (their own node's public key, NOT a channel PSK). With this set, direct
+  # messages from anyone else are ignored, and send_message always targets
+  # them — no contact table or discovery needed.
+  peer_public_key: !secret meshcore_peer_public_key
+
+  on_message:
+    then:
+      - logger.log:
+          format: "MeshCore message: %s"
+          args: ["text.c_str()"]
+      # e.g. forward it somewhere useful:
+      # - homeassistant.event:
+      #     event: esphome.meshcore_message
+      #     data:
+      #       text: !lambda 'return text;'
+
+button:
+  - platform: template
+    name: "Send MeshCore test message"
+    on_press:
+      - meshcore.send_message:
+          id: mesh_node
+          text: "Hello from ESPHome!"
