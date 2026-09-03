@@ -140,6 +140,7 @@ MESHCORE_ACTION_SCHEMA = cv.Schema({cv.GenerateID(): cv.use_id(MeshCoreComponent
             cv.Required(CONF_TEXT): cv.templatable(cv.string_strict),
         }
     ),
+    synchronous=True,
 )
 async def send_channel_text_action_to_code(config, action_id, template_arg, args):
     var = cg.new_Pvariable(action_id, template_arg)
@@ -149,7 +150,9 @@ async def send_channel_text_action_to_code(config, action_id, template_arg, args
     return var
 
 
-@automation.register_action("meshcore.send_advert", SendAdvertAction, MESHCORE_ACTION_SCHEMA)
+@automation.register_action(
+    "meshcore.send_advert", SendAdvertAction, MESHCORE_ACTION_SCHEMA, synchronous=True
+)
 async def send_advert_action_to_code(config, action_id, template_arg, args):
     var = cg.new_Pvariable(action_id, template_arg)
     await cg.register_parented(var, config[CONF_ID])
@@ -160,6 +163,7 @@ async def send_advert_action_to_code(config, action_id, template_arg, args):
     "meshcore.send_message",
     SendMessageAction,
     MESHCORE_ACTION_SCHEMA.extend({cv.Required(CONF_TEXT): cv.templatable(cv.string_strict)}),
+    synchronous=True,
 )
 async def send_message_action_to_code(config, action_id, template_arg, args):
     var = cg.new_Pvariable(action_id, template_arg)

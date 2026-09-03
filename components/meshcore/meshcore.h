@@ -68,11 +68,17 @@ class MeshCoreComponent : public Component
   float get_setup_priority() const override { return setup_priority::AFTER_WIFI; }
 
 #ifdef MC_USE_SX126X
-  void set_lora(sx126x::SX126x *r) { this->sx126x_ = r; }
+  void set_lora(sx126x::SX126x *r) {
+    this->sx126x_ = r;
+    r->register_listener(this);
+  }
   void on_packet(const std::vector<uint8_t> &packet, float rssi, float snr) override;
 #endif
 #ifdef MC_USE_SX127X
-  void set_lora(sx127x::SX127x *r) { this->sx127x_ = r; }
+  void set_lora(sx127x::SX127x *r) {
+    this->sx127x_ = r;
+    r->register_listener(this);
+  }
 #endif
 
   // --- identity / config, set from __init__.py codegen ---
