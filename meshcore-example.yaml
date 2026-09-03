@@ -6,6 +6,11 @@ esp32:
   framework:
     type: esp-idf
     
+external_components:
+  - source: github://urbanframe/esphome-meshcore@main
+    components: [meshcore]
+    refresh: 1d
+    
 logger:
 
 web_server:
@@ -25,10 +30,7 @@ wifi:
   password: !secret iot_wifi_password
   ap: {}
       
-external_components:
-  - source: github://urbanframe/esphome-meshcore@main
-    components: [meshcore]
-    refresh: 1d
+
 
 spi:
   clk_pin: GPIO5
