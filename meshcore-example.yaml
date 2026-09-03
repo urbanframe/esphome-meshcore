@@ -54,16 +54,27 @@ meshcore:
       - logger.log:
           format: "MeshCore message: %s"
           args: ["text.c_str()"]
-      # e.g. forward it somewhere useful:
-      # - homeassistant.event:
-      #     event: esphome.meshcore_message
-      #     data:
-      #       text: !lambda 'return text;'
+      - text_sensor.template.publish:
+          id: meshcore_last_message
+          state: !lambda 'return text;'
+
+text_sensor:
+  - platform: template
+    name: "MeshCore Last Message"
+    id: meshcore_last_message
+
+text:
+  - platform: template
+    name: "MeshCore Message to Send"
+    id: meshcore_message_to_send
+    optimistic: true
+    mode: text
+    initial_value: ""
 
 button:
   - platform: template
-    name: "Send MeshCore test message"
+    name: "Send MeshCore Message"
     on_press:
       - meshcore.send_message:
           id: mesh_node
-          text: "Hello from ESPHome!"
+          text: !lambda 'return id(meshcore_message_to_send).state;'
