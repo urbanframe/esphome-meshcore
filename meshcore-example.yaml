@@ -6,6 +6,25 @@ esp32:
   framework:
     type: esp-idf
     
+logger:
+
+web_server:
+  
+# Enable Home Assistant API
+api:
+  
+ota:
+  - platform: esphome
+
+# Allow provisioning Wi-Fi via serial
+improv_serial:
+
+wifi:
+  # Set up a wifi access point
+  ssid: !secret iot_wifi_ssid
+  password: !secret iot_wifi_password
+  ap: {}
+      
 external_components:
   - source: github://urbanframe/esphome-meshcore@main
     components: [meshcore]
