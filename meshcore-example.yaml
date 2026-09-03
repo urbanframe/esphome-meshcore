@@ -25,12 +25,12 @@ sx127x:
   modulation: LORA
   pa_pin: BOOST     # T-Beam's SX1276 is wired to the PA_BOOST pin, not RFO
   pa_power: 17      # BOOST mode max is 17; ESPHome will reject >17 here
-  frequency: 869525000
-  bandwidth: 250_0kHz
-  spreading_factor: 11
+  frequency: 869618000
+  bandwidth: 62_5kHz
+  spreading_factor: 8
   coding_rate: CR_4_5
-  preamble_size: 16
-  sync_value: [0x2B]  # MeshCore's public sync word — confirm against current firmware source before relying on this
+  preamble_size: 32
+  sync_value: [0x12]  # RadioLib's RADIOLIB_SX126X_SYNC_WORD_PRIVATE — confirmed against MeshCore's own source (platformio.ini + RadioLibWrappers.h)
 
 meshcore:
   id: mesh_node
