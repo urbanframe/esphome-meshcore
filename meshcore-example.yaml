@@ -7,9 +7,10 @@ esp32:
     type: esp-idf
     
 external_components:
-  - source: github://urbanframe/esphome-meshcore@main
+  - source:
+      type: local
+      path: components
     components: [meshcore]
-    refresh: 1d
     
 logger:
 
